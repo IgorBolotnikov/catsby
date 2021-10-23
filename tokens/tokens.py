@@ -7,13 +7,14 @@ from typing import Union
 class TokenType(Enum):
     """Every possible token type."""
 
-    NUMBER = 0
-    PLUS = 1
-    MINUS = 3
-    MULTIPLY = 4
-    DIVIDE = 5
-    LEFT_PAREN = 6
-    RIGHT_PAREN = 7
+    NUMBER = "NUMBER"
+    PLUS = "PLUS"
+    MINUS = "MINUS"
+    MULTIPLY = "MULTIPLY"
+    DIVIDE = "DIVIDE"
+    LEFT_PAREN = "LEFT_PAREN"
+    RIGHT_PAREN = "RIGHT_PAREN"
+    POWER = "POWER"
 
 
 @dataclass

@@ -12,6 +12,7 @@ from .char_helpers import (
     is_point,
     is_right_paren,
     is_whitespace,
+    is_power,
 )
 from .constants import DECIMAL_POINT
 
@@ -55,6 +56,8 @@ class Lexer:
                 yield self.generate_left_paren()
             elif is_right_paren(self.curr_char):
                 yield self.generate_right_paren()
+            elif is_power(self.curr_char):
+                yield self.generate_power_operator()
             else:
                 raise Exception(f"Illegal character, '{self.curr_char}'")
 
@@ -119,3 +122,9 @@ class Lexer:
 
         self.advance()
         return Token(TokenType.RIGHT_PAREN)
+
+    def generate_power_operator(self) -> Token:
+        """Generate power operator token."""
+
+        self.advance()
+        return Token(TokenType.POWER)

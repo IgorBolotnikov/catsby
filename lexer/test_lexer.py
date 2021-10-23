@@ -26,12 +26,13 @@ def test_numbers():
 
 
 def test_operators():
-    tokens = list(Lexer("*/+-").generate_tokens())
+    tokens = list(Lexer("*/+-^").generate_tokens())
     assert tokens == [
         Token(TokenType.MULTIPLY),
         Token(TokenType.DIVIDE),
         Token(TokenType.PLUS),
         Token(TokenType.MINUS),
+        Token(TokenType.POWER),
     ]
 
 

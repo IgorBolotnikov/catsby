@@ -7,7 +7,7 @@ from .constants import (
     MULTIPLY,
     PLUS,
     MINUS,
-    RIGHT_PAREN,
+    POWER, RIGHT_PAREN,
     WHITESPACE,
 )
 
@@ -70,3 +70,9 @@ def is_right_paren(char: Optional[str]) -> bool:
     """Check if character is a right parenthesis."""
 
     return char == RIGHT_PAREN
+
+
+def is_power(char: Optional[str]) -> bool:
+    """Check if character is a right parenthesis."""
+
+    return char == POWER
