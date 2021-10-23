@@ -6,7 +6,7 @@ from .interpreter import Interpreter
 from .values import Number
 from nodes import (
     AddNode, DivideNode, MinusNode, MultiplyNode, NumberNode, PlusNode,
-    SubtractNode,
+    PowerNode, SubtractNode,
 )
 
 
@@ -21,6 +21,7 @@ def test_number():
     (SubtractNode, Decimal("10.0"), Decimal("5"), Number(Decimal("5.0"))),
     (MultiplyNode, Decimal("10.0"), Decimal("5"), Number(Decimal("50.0"))),
     (DivideNode, Decimal("10.0"), Decimal("5"), Number(Decimal("2.0"))),
+    (PowerNode, Decimal("10.0"), Decimal("5"), Number(Decimal("100000.0"))),
 ])
 def test_operations(node, value1, value2, expected):
     tree = node(  # noqa

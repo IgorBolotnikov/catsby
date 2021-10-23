@@ -1,4 +1,6 @@
-from nodes import AddNode, MinusNode, Node, NumberNode, PlusNode
+from decimal import Decimal
+
+from nodes import AddNode, MinusNode, Node, NumberNode, PlusNode, PowerNode
 from .values import Number
 
 
@@ -27,6 +29,13 @@ class Interpreter:
             return Number(self.visit(node.node_a).value / self.visit(node.node_b).value)
         except:
             raise Exception("Runtime math error")
+
+    def visit_PowerNode(self, node: PowerNode) -> Number:
+        value = self.visit(node.node).value
+        if value < 0:
+            raise Exception("Division by zero error")
+        power = self.visit(node.power).value
+        return Number(value ** power)
 
     def visit_PlusNode(self, node: PlusNode) -> Number:
         return self.visit(node.node)
