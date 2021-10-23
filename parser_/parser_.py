@@ -1,12 +1,12 @@
 from typing import Any, Optional, Iterable
 
 from nodes import (
-    AddNode, DivideNode, ExprNode, MinusNode, MultiplyNode, NumberNode, PlusNode,
-    SubtractNode, TermNode,
+    AddNode, DivideNode, ExprNode, MinusNode, MultiplyNode, Node, NumberNode, PlusNode,
+    PowerNode, SubtractNode, TermNode,
 )
 from tokens import (
     Token, is_divide, is_left_paren, is_minus, is_multiply, is_multiply_or_divide,
-    is_number, is_plus, is_plus_or_minus, is_right_paren,
+    is_number, is_plus, is_plus_or_minus, is_power, is_right_paren,
 )
 
 
@@ -68,17 +68,29 @@ class Parser:
 
         return result
 
-    def _generate_factor(self) -> Any:
+    def _generate_factor(self) -> Node:
         token = self._curr_token
 
+        if is_plus(token.type):
+            return self._generate_plus_node()
+        elif is_minus(token.type):
+            return self._generate_minus_node()
+
+        return self._generate_power()
+
+    def _generate_power(self) -> Node:
+        result = self._generate_atom()
+
+        while self._has_curr_token and is_power(self._curr_token.type):
+            result = self._generate_power_node(result)
+        return result
+
+    def _generate_atom(self) -> Node:
+        token = self._curr_token
         if is_left_paren(token.type):
             return self._generate_left_paren_node()
         elif is_number(token.type):
             return self._generate_number_node(token)
-        elif is_plus(token.type):
-            return self._generate_plus_node()
-        elif is_minus(token.type):
-            return self._generate_minus_node()
 
         self._raise_syntax_error()
 
@@ -109,6 +121,10 @@ class Parser:
     def _generate_minus_node(self) -> MinusNode:
         self._advance()
         return MinusNode(self._generate_factor())
+
+    def _generate_power_node(self, node: Node) -> PowerNode:
+        self._advance()
+        return PowerNode(node, self._generate_factor())
 
     def _generate_left_paren_node(self) -> ExprNode:
         self._advance()

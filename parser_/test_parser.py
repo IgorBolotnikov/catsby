@@ -5,7 +5,7 @@ import pytest
 
 from nodes import (
     AddNode, DivideNode, ExprNode, MinusNode, MultiplyNode, NumberNode,
-    PlusNode, SubtractNode,
+    PlusNode, PowerNode, SubtractNode,
 )
 from tokens import Token, TokenType
 from .parser_ import Parser
@@ -29,6 +29,7 @@ def test_number():
     (Token(TokenType.MINUS), SubtractNode),
     (Token(TokenType.MULTIPLY), MultiplyNode),
     (Token(TokenType.DIVIDE), DivideNode),
+    (Token(TokenType.POWER), PowerNode),
 ])
 def test_operators(token, node_class: Type[ExprNode]):
     value1 = Decimal("2")
