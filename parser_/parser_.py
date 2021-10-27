@@ -1,7 +1,9 @@
+from decimal import Decimal
 from typing import Any, Iterable, NoReturn, Optional
 
 from nodes import (
     AddNode,
+    AssignmentNode,
     DivideNode,
     MinusNode,
     ModuloNode,
@@ -11,10 +13,13 @@ from nodes import (
     PlusNode,
     PowerNode,
     SubtractNode,
+    ValueAccessNode,
 )
 from tokens import (
     Token,
+    is_assignment,
     is_divide,
+    is_identifier,
     is_left_paren,
     is_minus,
     is_modulo,
@@ -23,6 +28,7 @@ from tokens import (
     is_plus,
     is_power,
     is_right_paren,
+    is_var,
 )
 
 
@@ -66,6 +72,9 @@ class Parser:
         raise Exception("Unexpected EOF")
 
     def _generate_expr(self) -> Node:
+        if self._curr_token and is_var(self._curr_token):
+            return self._generate_assignment_node()
+
         result = self._generate_term()
 
         while self._curr_token:
@@ -121,6 +130,8 @@ class Parser:
             return self._generate_left_paren_node()
         elif is_number(token.type):
             return self._generate_number_node(token)
+        elif is_identifier(token.type):
+            return self._generate_value_access_node(token)
         self._raise_syntax_error()
 
     def _generate_add_node(self, node_a: Any) -> AddNode:
@@ -143,7 +154,7 @@ class Parser:
         self._advance()
         if token.value is None:
             raise Exception("Number token should have value")
-        return NumberNode(token.value)
+        return NumberNode(Decimal(token.value))
 
     def _generate_plus_node(self) -> PlusNode:
         self._advance()
@@ -170,3 +181,19 @@ class Parser:
     def _generate_modulo_node(self, node: Node) -> ModuloNode:
         self._advance()
         return ModuloNode(node, self._generate_factor())
+
+    def _generate_assignment_node(self) -> AssignmentNode:
+        self._advance()
+        if not self._curr_token or not is_identifier(self._curr_token.type):
+            self._raise_syntax_error()
+        name = str(self._curr_token.value)
+        self._advance()
+        if not self._curr_token or not is_assignment(self._curr_token.type):
+            self._raise_syntax_error()
+        self._advance()
+        value = self._generate_expr()
+        return AssignmentNode(name, value)
+
+    def _generate_value_access_node(self, token: Token) -> Node:
+        self._advance()
+        return ValueAccessNode(str(token.value))

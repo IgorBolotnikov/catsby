@@ -3,10 +3,13 @@ from typing import Generator, Optional
 
 from tokens import Token, TokenType
 
+from .char_constants import DECIMAL_POINT
 from .char_helpers import (
+    is_assignment,
     is_digit_or_point,
     is_divide,
     is_left_paren,
+    is_letter,
     is_minus,
     is_modulo,
     is_multiply,
@@ -16,7 +19,7 @@ from .char_helpers import (
     is_right_paren,
     is_whitespace,
 )
-from .constants import DECIMAL_POINT
+from .lexer_helpers import is_identifier_char, is_keyword
 
 
 class Lexer:
@@ -46,6 +49,8 @@ class Lexer:
                 self.advance()
             elif is_digit_or_point(self._curr_char):
                 yield self.generate_number()
+            elif is_letter(self._curr_char):
+                yield self.generate_identifier()
             elif is_plus(self._curr_char):
                 yield self.generate_plus()
             elif is_minus(self._curr_char):
@@ -62,6 +67,8 @@ class Lexer:
                 yield self.generate_power_operator()
             elif is_modulo(self._curr_char):
                 yield self.generate_modulo_operator()
+            elif is_assignment(self._curr_char):
+                yield self.generate_assignment()
             else:
                 raise Exception(f"Illegal character, '{self._curr_char}'")
 
@@ -139,3 +146,25 @@ class Lexer:
 
         self.advance()
         return Token(TokenType.MODULO)
+
+    def generate_assignment(self) -> Token:
+        """Generate an assignment token."""
+
+        self.advance()
+        return Token(TokenType.ASSIGNMENT)
+
+    def generate_identifier(self) -> Token:
+        """Generate a variable identifier token."""
+
+        if self._curr_char is None:
+            raise Exception("Current char is None")
+
+        id_str: str = self._curr_char
+        self.advance()
+        while self._curr_char is not None and is_identifier_char(self._curr_char):
+            id_str += self._curr_char
+            self.advance()
+
+        token_type = TokenType.KEYWORD if is_keyword(id_str) else TokenType.IDENTIFIER
+
+        return Token(token_type, id_str)

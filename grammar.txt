@@ -1,4 +1,5 @@
-expression  : term ((PLUS|MINUS) term)*
+expression  : KEYWORD:var IDENTIFIER ASSIGNMENT expression
+            : term ((PLUS|MINUS) term)*
 
 term        : factor ((MULTIPLY|DIVIDE|MODULO) factor)*
 
@@ -6,5 +7,5 @@ factor      : (PLUS|MINUS) power
 
 power       : atom ((POWER) factor)*
 
-atom        : DECIMAL
+atom        : DECIMAL|IDENTIFIER
             : LEFT_PAREN expression RIGHT_PAREN

@@ -56,3 +56,13 @@ def test_expression():
         Token(TokenType.MULTIPLY),
         Token(TokenType.NUMBER, Decimal("18.0")),
     ]
+
+
+def test_variable():
+    tokens = list(Lexer("var my_var1 = 100").generate_tokens())
+    assert tokens == [
+        Token(TokenType.KEYWORD, "var"),
+        Token(TokenType.IDENTIFIER, "my_var1"),
+        Token(TokenType.ASSIGNMENT),
+        Token(TokenType.NUMBER, Decimal("100")),
+    ]

@@ -1,10 +1,23 @@
-from nodes import AddNode, MinusNode, Node, NumberNode, PlusNode, PowerNode
+from nodes import (
+    AddNode,
+    AssignmentNode,
+    MinusNode,
+    Node,
+    NumberNode,
+    PlusNode,
+    PowerNode,
+    ValueAccessNode,
+)
 
+from .symbol_table import SymbolTable
 from .values import Number
 
 
 class Interpreter:
-    __slots__ = "_tree"
+    __slots__ = "_symbol_table"
+
+    def __init__(self) -> None:
+        self._symbol_table = SymbolTable()
 
     def visit(self, node: Node) -> Number:
         method_name = f"visit_{type(node).__name__}"
@@ -47,3 +60,17 @@ class Interpreter:
 
     def visit_MinusNode(self, node: MinusNode) -> Number:
         return Number(-self.visit(node.node).value)
+
+    def visit_ValueAccessNode(self, node: ValueAccessNode) -> Number:
+        name = node.name
+        value = self._symbol_table.get(name)
+        if value is None:
+            raise Exception(f"'{name}' is not defined")
+        return value
+
+    def visit_AssignmentNode(self, node: AssignmentNode) -> None:
+        name = node.name
+        value = self.visit(node.value)
+        if self._symbol_table.get(name) is not None:
+            raise Exception(f"'{name}' is already defined")
+        self._symbol_table.set(name, value)

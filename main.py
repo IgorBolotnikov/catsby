@@ -8,6 +8,7 @@ def run() -> None:
 
     Terminate the session if user enters 'exit()'
     """
+    interpreter = Interpreter()
     while True:
         try:
             text = input("🐱 ► ")
@@ -21,7 +22,6 @@ def run() -> None:
                 tree = parser.parse()
                 if not tree:
                     continue
-                interpreter = Interpreter()
                 value = interpreter.visit(tree)
                 print(value)
         except Exception as e:

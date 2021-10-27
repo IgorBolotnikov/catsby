@@ -1,0 +1,1 @@
+KEYWORDS = frozenset({"var"})
