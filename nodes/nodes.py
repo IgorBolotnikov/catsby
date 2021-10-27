@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Union
+from typing import Union
 
 
 @dataclass
@@ -73,8 +74,17 @@ class PowerNode:
         return f"({self.node}^({self.power}))"
 
 
+@dataclass
+class ModuloNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}%{self.node_b})"
+
+
 ExprNode = Union[SubtractNode, AddNode, DivideNode, MultiplyNode]
-TermNode = Union[DivideNode, MultiplyNode]
+TermNode = Union[DivideNode, MultiplyNode, ModuloNode]
 Node = Union[
     NumberNode,
     PlusNode,
@@ -84,4 +94,5 @@ Node = Union[
     DivideNode,
     MultiplyNode,
     PowerNode,
+    ModuloNode,
 ]

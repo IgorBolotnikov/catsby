@@ -1,6 +1,5 @@
-from decimal import Decimal
-
 from nodes import AddNode, MinusNode, Node, NumberNode, PlusNode, PowerNode
+
 from .values import Number
 
 
@@ -27,7 +26,13 @@ class Interpreter:
     def visit_DivideNode(self, node: AddNode) -> Number:
         try:
             return Number(self.visit(node.node_a).value / self.visit(node.node_b).value)
-        except:
+        except ZeroDivisionError:
+            raise Exception("Runtime math error")
+
+    def visit_ModuloNode(self, node: AddNode) -> Number:
+        try:
+            return Number(self.visit(node.node_a).value % self.visit(node.node_b).value)
+        except ZeroDivisionError:
             raise Exception("Runtime math error")
 
     def visit_PowerNode(self, node: PowerNode) -> Number:
@@ -42,4 +47,3 @@ class Interpreter:
 
     def visit_MinusNode(self, node: MinusNode) -> Number:
         return Number(-self.visit(node.node).value)
-

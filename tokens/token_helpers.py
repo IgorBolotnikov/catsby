@@ -59,3 +59,9 @@ def is_power(token_type: TokenType) -> bool:
     """Check is token is a power operator symbol."""
 
     return token_type == TokenType.POWER
+
+
+def is_modulo(token_type: TokenType) -> bool:
+    """Check is token is a modulo operator symbol."""
+
+    return token_type == TokenType.MODULO

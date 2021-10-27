@@ -2,27 +2,29 @@ from decimal import Decimal
 from typing import Generator, Optional
 
 from tokens import Token, TokenType
+
 from .char_helpers import (
     is_digit_or_point,
     is_divide,
     is_left_paren,
     is_minus,
+    is_modulo,
     is_multiply,
     is_plus,
     is_point,
+    is_power,
     is_right_paren,
     is_whitespace,
-    is_power,
 )
 from .constants import DECIMAL_POINT
 
 
 class Lexer:
-    __slots__ = "text", "curr_char"
+    __slots__ = "_text", "_curr_char"
 
     def __init__(self, text: str) -> None:
-        self.text = iter(text)
-        self.curr_char: Optional[str] = None
+        self._text = iter(text)
+        self._curr_char: Optional[str] = None
         self.advance()
 
     def advance(self) -> None:
@@ -32,35 +34,36 @@ class Lexer:
         """
 
         try:
-            self.curr_char = next(self.text)
+            self._curr_char = next(self._text)
         except StopIteration:
-            self.curr_char = None
+            self._curr_char = None
 
     def generate_tokens(self) -> Generator[Token, None, None]:
         """TODO: Fill up the doc."""
 
-        while self.curr_char is not None:
-            if is_whitespace(self.curr_char):
+        while self._curr_char is not None:
+            if is_whitespace(self._curr_char):
                 self.advance()
-            elif is_digit_or_point(self.curr_char):
+            elif is_digit_or_point(self._curr_char):
                 yield self.generate_number()
-            elif is_plus(self.curr_char):
+            elif is_plus(self._curr_char):
                 yield self.generate_plus()
-            elif is_minus(self.curr_char):
+            elif is_minus(self._curr_char):
                 yield self.generate_minus()
-            elif is_multiply(self.curr_char):
+            elif is_multiply(self._curr_char):
                 yield self.generate_multiply()
-            elif is_divide(self.curr_char):
+            elif is_divide(self._curr_char):
                 yield self.generate_divide()
-            elif is_left_paren(self.curr_char):
+            elif is_left_paren(self._curr_char):
                 yield self.generate_left_paren()
-            elif is_right_paren(self.curr_char):
+            elif is_right_paren(self._curr_char):
                 yield self.generate_right_paren()
-            elif is_power(self.curr_char):
+            elif is_power(self._curr_char):
                 yield self.generate_power_operator()
+            elif is_modulo(self._curr_char):
+                yield self.generate_modulo_operator()
             else:
-                raise Exception(f"Illegal character, '{self.curr_char}'")
-
+                raise Exception(f"Illegal character, '{self._curr_char}'")
 
     def generate_number(self) -> Token:
         """Generate a decimal number token.
@@ -69,15 +72,17 @@ class Lexer:
         """
 
         decimal_point_count = 0
-        number_str = self.curr_char
+        if self._curr_char is None:
+            raise Exception("Current char is None")
+        number_str: str = self._curr_char
         self.advance()
-        while is_digit_or_point(self.curr_char):
-            if is_point(self.curr_char):
+        while self._curr_char is not None and is_digit_or_point(self._curr_char):
+            if is_point(self._curr_char):
                 decimal_point_count += 1
                 if decimal_point_count > 1:
                     break
 
-            number_str += self.curr_char
+            number_str += self._curr_char
             self.advance()
 
         if number_str.startswith(DECIMAL_POINT):
@@ -128,3 +133,9 @@ class Lexer:
 
         self.advance()
         return Token(TokenType.POWER)
+
+    def generate_modulo_operator(self) -> Token:
+        """Generate modulo operator token."""
+
+        self.advance()
+        return Token(TokenType.MODULO)

@@ -1,6 +1,6 @@
 expression  : term ((PLUS|MINUS) term)*
 
-term        : factor ((MULTIPLY|DIVIDE) factor)*
+term        : factor ((MULTIPLY|DIVIDE|MODULO) factor)*
 
 factor      : (PLUS|MINUS) power
 

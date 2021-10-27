@@ -3,11 +3,14 @@ from typing import Optional
 from .constants import (
     DECIMAL_POINT,
     DIGITS,
-    DIVIDE, LEFT_PAREN,
+    DIVIDE,
+    LEFT_PAREN,
+    MINUS,
+    MODULO,
     MULTIPLY,
     PLUS,
-    MINUS,
-    POWER, RIGHT_PAREN,
+    POWER,
+    RIGHT_PAREN,
     WHITESPACE,
 )
 
@@ -76,3 +79,9 @@ def is_power(char: Optional[str]) -> bool:
     """Check if character is a right parenthesis."""
 
     return char == POWER
+
+
+def is_modulo(char: Optional[str]) -> bool:
+    """Check if character is a modulo symbol."""
+
+    return char == MODULO
