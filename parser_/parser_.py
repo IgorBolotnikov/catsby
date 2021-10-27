@@ -133,11 +133,11 @@ class Parser:
 
     def _generate_multiply_node(self, node_a: Any) -> MultiplyNode:
         self._advance()
-        return MultiplyNode(node_a, self._generate_term())
+        return MultiplyNode(node_a, self._generate_factor())
 
     def _generate_divide_node(self, node_a: Any) -> DivideNode:
         self._advance()
-        return DivideNode(node_a, self._generate_term())
+        return DivideNode(node_a, self._generate_factor())
 
     def _generate_number_node(self, token: Token) -> NumberNode:
         self._advance()
