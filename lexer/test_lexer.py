@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from tokens import Token, TokenType
+
 from .lexer import Lexer
 
 
@@ -26,22 +27,20 @@ def test_numbers():
 
 
 def test_operators():
-    tokens = list(Lexer("*/+-^").generate_tokens())
+    tokens = list(Lexer("*/+-^%").generate_tokens())
     assert tokens == [
         Token(TokenType.MULTIPLY),
         Token(TokenType.DIVIDE),
         Token(TokenType.PLUS),
         Token(TokenType.MINUS),
         Token(TokenType.POWER),
+        Token(TokenType.MODULO),
     ]
 
 
 def test_parentheses():
     tokens = list(Lexer("()").generate_tokens())
-    assert tokens == [
-        Token(TokenType.LEFT_PAREN),
-        Token(TokenType.RIGHT_PAREN),
-    ]
+    assert tokens == [Token(TokenType.LEFT_PAREN), Token(TokenType.RIGHT_PAREN)]
 
 
 def test_expression():
