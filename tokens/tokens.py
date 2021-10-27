@@ -16,13 +16,19 @@ class TokenType(Enum):
     RIGHT_PAREN = "RIGHT_PAREN"
     POWER = "POWER"
     MODULO = "MODULO"
+    KEYWORD = "KEYWORD"
+    IDENTIFIER = "IDENTIFIER"
+    ASSIGNMENT = "ASSIGNMENT"
 
 
 @dataclass
 class Token:
     type: TokenType
-    value: Union[Decimal, None] = None
+    value: Union[Decimal, str, None] = None
 
     def __repr__(self) -> str:
         value = f": {self.value}" if self.value is not None else ""
         return f"<{self.type.name}{value}>"
+
+
+VAR_TOKEN = Token(TokenType.KEYWORD, "var")

@@ -1,16 +1,19 @@
 from typing import Optional
 
-from .constants import (
+from .char_constants import (
+    ASSIGNMENT,
     DECIMAL_POINT,
     DIGITS,
     DIVIDE,
     LEFT_PAREN,
+    LETTERS,
     MINUS,
     MODULO,
     MULTIPLY,
     PLUS,
     POWER,
     RIGHT_PAREN,
+    UNDERSCORE,
     WHITESPACE,
 )
 
@@ -37,6 +40,18 @@ def is_digit_or_point(char: Optional[str]) -> bool:
     """Check if character is any digit or decimal point."""
 
     return is_point(char) or char in DIGITS
+
+
+def is_letter(char: Optional[str]) -> bool:
+    """Check if character is any letter."""
+
+    return char in LETTERS
+
+
+def is_letter_or_underscore(char: Optional[str]) -> bool:
+    """Check if character is any letter or underscore."""
+
+    return char in LETTERS or char == UNDERSCORE
 
 
 def is_plus(char: Optional[str]) -> bool:
@@ -85,3 +100,9 @@ def is_modulo(char: Optional[str]) -> bool:
     """Check if character is a modulo symbol."""
 
     return char == MODULO
+
+
+def is_assignment(char: Optional[str]) -> bool:
+    """Check if character is an assignment sign."""
+
+    return char == ASSIGNMENT
