@@ -53,6 +53,61 @@ def test_operators(token, node_class: Type[ExprNode]):
     assert tree == expected
 
 
+def test_operator_combinations_divide_multiply():
+    tokens = [
+        Token(TokenType.NUMBER, Decimal("18")),
+        Token(TokenType.DIVIDE),
+        Token(TokenType.NUMBER, Decimal("3")),
+        Token(TokenType.MULTIPLY),
+        Token(TokenType.NUMBER, Decimal("6")),
+    ]
+    expected = MultiplyNode(
+        DivideNode(NumberNode(Decimal("18")), NumberNode(Decimal("3"))),
+        NumberNode(Decimal("6")),
+    )
+    assert Parser(tokens).parse() == expected
+
+
+def test_operator_combinations_multiply_divide_modulo():
+    tokens = [
+        Token(TokenType.NUMBER, Decimal("4")),
+        Token(TokenType.MULTIPLY),
+        Token(TokenType.NUMBER, Decimal("5")),
+        Token(TokenType.DIVIDE),
+        Token(TokenType.NUMBER, Decimal("2")),
+        Token(TokenType.MODULO),
+        Token(TokenType.NUMBER, Decimal("3")),
+    ]
+    expected = ModuloNode(
+        DivideNode(
+            MultiplyNode(NumberNode(Decimal("4")), NumberNode(Decimal("5"))),
+            NumberNode(Decimal("2")),
+        ),
+        NumberNode(Decimal("3")),
+    )
+    assert Parser(tokens).parse() == expected
+
+
+def test_operator_combinations_minus_plus_minus():
+    tokens = [
+        Token(TokenType.NUMBER, Decimal("18")),
+        Token(TokenType.MINUS),
+        Token(TokenType.NUMBER, Decimal("3")),
+        Token(TokenType.PLUS),
+        Token(TokenType.NUMBER, Decimal("6")),
+        Token(TokenType.MINUS),
+        Token(TokenType.NUMBER, Decimal("5")),
+    ]
+    expected = SubtractNode(
+        AddNode(
+            SubtractNode(NumberNode(Decimal("18")), NumberNode(Decimal("3"))),
+            NumberNode(Decimal("6")),
+        ),
+        NumberNode(Decimal("5")),
+    )
+    assert Parser(tokens).parse() == expected
+
+
 def test_expression():
     tokens = [
         Token(TokenType.LEFT_PAREN),
