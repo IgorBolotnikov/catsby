@@ -5,6 +5,7 @@ import pytest
 
 from nodes import (
     AddNode,
+    AssignmentNode,
     DivideNode,
     ExprNode,
     MinusNode,
@@ -14,6 +15,7 @@ from nodes import (
     PlusNode,
     PowerNode,
     SubtractNode,
+    ValueAccessNode,
 )
 from tokens import Token, TokenType
 
@@ -127,3 +129,28 @@ def test_expression():
         ),
         NumberNode(Decimal("18.0")),
     )
+
+
+def test_variable_assignment():
+    tokens = [
+        Token(TokenType.KEYWORD, "var"),
+        Token(TokenType.IDENTIFIER, "my_var1"),
+        Token(TokenType.ASSIGNMENT),
+        Token(TokenType.NUMBER, Decimal("100")),
+        Token(TokenType.MULTIPLY),
+        Token(TokenType.NUMBER, Decimal("2")),
+    ]
+    tree = Parser(tokens).parse()
+    assert tree == AssignmentNode(
+        "my_var1", MultiplyNode(NumberNode(Decimal("100")), NumberNode(Decimal("2")))
+    )
+
+
+def test_variable_access():
+    tokens = [
+        Token(TokenType.IDENTIFIER, "my_var1"),
+        Token(TokenType.PLUS),
+        Token(TokenType.IDENTIFIER, "my_var2"),
+    ]
+    tree = Parser(tokens).parse()
+    assert tree == AddNode(ValueAccessNode("my_var1"), ValueAccessNode("my_var2"))

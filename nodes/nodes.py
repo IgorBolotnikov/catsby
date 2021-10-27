@@ -83,6 +83,23 @@ class ModuloNode:
         return f"({self.node_a}%{self.node_b})"
 
 
+@dataclass
+class AssignmentNode:
+    name: str
+    value: Node
+
+    def __repr__(self) -> str:
+        return f"{self.name}={self.value}"
+
+
+@dataclass
+class ValueAccessNode:
+    name: str
+
+    def __repr__(self) -> str:
+        return f"{self.name}"
+
+
 ExprNode = Union[SubtractNode, AddNode, DivideNode, MultiplyNode]
 TermNode = Union[DivideNode, MultiplyNode, ModuloNode]
 Node = Union[
@@ -95,4 +112,6 @@ Node = Union[
     MultiplyNode,
     PowerNode,
     ModuloNode,
+    AssignmentNode,
+    ValueAccessNode,
 ]

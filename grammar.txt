@@ -7,5 +7,5 @@ factor      : (PLUS|MINUS) power
 
 power       : atom ((POWER) factor)*
 
-atom        : DECIMAL
+atom        : DECIMAL|IDENTIFIER
             : LEFT_PAREN expression RIGHT_PAREN
