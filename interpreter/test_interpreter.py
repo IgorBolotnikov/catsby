@@ -4,6 +4,7 @@ import pytest
 
 from nodes import (
     AddNode,
+    AssignmentNode,
     DivideNode,
     MinusNode,
     ModuloNode,
@@ -12,6 +13,7 @@ from nodes import (
     PlusNode,
     PowerNode,
     SubtractNode,
+    ValueAccessNode,
 )
 
 from .interpreter import Interpreter
@@ -57,3 +59,29 @@ def test_expression():
     )
     value = Interpreter().visit(tree)
     assert value == Number(Decimal("-50.40"))
+
+
+def test_variables():
+    assign1_tree = AssignmentNode(
+        "my_var1", MultiplyNode(NumberNode(Decimal("100")), NumberNode(Decimal("2")))
+    )
+    assign2_tree = AssignmentNode(
+        "my_var2", DivideNode(NumberNode(Decimal("30")), NumberNode(Decimal("2")))
+    )
+    access_tree = AddNode(ValueAccessNode("my_var1"), ValueAccessNode("my_var2"))
+    interpreter = Interpreter()
+    value1 = interpreter.visit(assign1_tree)
+    value2 = interpreter.visit(assign2_tree)
+    value3 = interpreter.visit(access_tree)
+    assert value1 is None
+    assert value2 is None
+    assert value3 == Number(Decimal("215"))
+
+
+def test_variable_assignment_exception():
+    assign1_tree = AssignmentNode("my_var1", NumberNode(Decimal("2")))
+    assign2_tree = AssignmentNode("my_var1", NumberNode(Decimal("30")))
+    interpreter = Interpreter()
+    interpreter.visit(assign1_tree)
+    with pytest.raises(Exception):
+        interpreter.visit(assign2_tree)
