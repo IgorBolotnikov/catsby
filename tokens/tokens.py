@@ -18,7 +18,7 @@ class TokenType(Enum):
     MODULO = "MODULO"
     KEYWORD = "KEYWORD"
     IDENTIFIER = "IDENTIFIER"
-    ASSIGNMENT = "ASSIGNMENT"
+    EQ = "EQ"
 
 
 @dataclass

@@ -151,7 +151,7 @@ class Lexer:
         """Generate an assignment token."""
 
         self.advance()
-        return Token(TokenType.ASSIGNMENT)
+        return Token(TokenType.EQ)
 
     def generate_identifier(self) -> Token:
         """Generate a variable identifier token."""

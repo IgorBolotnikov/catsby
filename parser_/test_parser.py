@@ -135,7 +135,7 @@ def test_variable_assignment():
     tokens = [
         Token(TokenType.KEYWORD, "var"),
         Token(TokenType.IDENTIFIER, "my_var1"),
-        Token(TokenType.ASSIGNMENT),
+        Token(TokenType.EQ),
         Token(TokenType.NUMBER, Decimal("100")),
         Token(TokenType.MULTIPLY),
         Token(TokenType.NUMBER, Decimal("2")),

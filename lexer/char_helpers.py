@@ -1,10 +1,10 @@
 from typing import Optional
 
 from .char_constants import (
-    ASSIGNMENT,
     DECIMAL_POINT,
     DIGITS,
     DIVIDE,
+    EQ,
     LEFT_PAREN,
     LETTERS,
     MINUS,
@@ -105,4 +105,4 @@ def is_modulo(char: Optional[str]) -> bool:
 def is_assignment(char: Optional[str]) -> bool:
     """Check if character is an assignment sign."""
 
-    return char == ASSIGNMENT
+    return char == EQ

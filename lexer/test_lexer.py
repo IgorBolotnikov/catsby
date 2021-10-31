@@ -63,6 +63,6 @@ def test_variable():
     assert tokens == [
         Token(TokenType.KEYWORD, "var"),
         Token(TokenType.IDENTIFIER, "my_var1"),
-        Token(TokenType.ASSIGNMENT),
+        Token(TokenType.EQ),
         Token(TokenType.NUMBER, Decimal("100")),
     ]

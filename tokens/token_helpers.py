@@ -82,4 +82,4 @@ def is_identifier(token_type: TokenType) -> bool:
 def is_assignment(token_type: TokenType) -> bool:
     """Check if token is an assignment token."""
 
-    return token_type == TokenType.ASSIGNMENT
+    return token_type == TokenType.EQ
