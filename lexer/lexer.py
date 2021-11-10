@@ -1,10 +1,11 @@
 from decimal import Decimal
-from typing import Generator, Optional
+from typing import Generator, NoReturn, Optional
 
 from tokens import Token, TokenType
 
 from .char_constants import DECIMAL_POINT
 from .char_helpers import (
+    is_and,
     is_digit_or_point,
     is_divide,
     is_equals,
@@ -16,6 +17,7 @@ from .char_helpers import (
     is_modulo,
     is_multiply,
     is_not,
+    is_or,
     is_plus,
     is_point,
     is_power,
@@ -43,6 +45,12 @@ class Lexer:
             self._curr_char = next(self._text)
         except StopIteration:
             self._curr_char = None
+
+    def raise_illegal_char(self) -> NoReturn:
+        raise Exception(f"Illegal character, '{self._curr_char}'")
+
+    def raise_null_char(self) -> NoReturn:
+        raise Exception("Current char is None")
 
     def generate_tokens(self) -> Generator[Token, None, None]:
         """TODO: Fill up the doc."""
@@ -78,8 +86,12 @@ class Lexer:
                 yield self.generate_greater_than()
             elif is_not(self._curr_char):
                 yield self.generate_not()
+            elif is_and(self._curr_char):
+                yield self.generate_and()
+            elif is_or(self._curr_char):
+                yield self.generate_or()
             else:
-                raise Exception(f"Illegal character, '{self._curr_char}'")
+                self.raise_illegal_char()
 
     def generate_number(self) -> Token:
         """Generate a decimal number token.
@@ -89,7 +101,7 @@ class Lexer:
 
         decimal_point_count = 0
         if self._curr_char is None:
-            raise Exception("Current char is None")
+            self.raise_null_char()
         number_str: str = self._curr_char
         self.advance()
         while self._curr_char is not None and is_digit_or_point(self._curr_char):
@@ -157,16 +169,19 @@ class Lexer:
         return Token(TokenType.MODULO)
 
     def generate_assignment(self) -> Token:
-        """Generate an assignment token."""
+        """Generate an assignment or double equals token."""
 
         self.advance()
+        if is_equals(self._curr_char):
+            self.advance()
+            return Token(TokenType.EQEQ)
         return Token(TokenType.EQ)
 
     def generate_identifier(self) -> Token:
         """Generate a variable identifier token."""
 
         if self._curr_char is None:
-            raise Exception("Current char is None")
+            self.raise_null_char()
 
         id_str: str = self._curr_char
         self.advance()
@@ -204,3 +219,21 @@ class Lexer:
             self.advance()
             return Token(TokenType.NE)
         return Token(TokenType.NOT)
+
+    def generate_and(self) -> Token:
+        """Generate 'and' token."""
+
+        self.advance()
+        if not is_and(self._curr_char):
+            self.raise_illegal_char()
+        self.advance()
+        return Token(TokenType.AND)
+
+    def generate_or(self) -> Token:
+        """Generate 'or' token."""
+
+        self.advance()
+        if not is_or(self._curr_char):
+            self.raise_illegal_char()
+        self.advance()
+        return Token(TokenType.OR)

@@ -33,6 +33,8 @@ class TokenType(Enum):
     GTE = "GTE"
     NE = "NE"
     NOT = "NOT"
+    AND = "AND"
+    OR = "OR"
 
 
 @dataclass

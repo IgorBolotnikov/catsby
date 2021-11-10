@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .char_constants import (
+    AND,
     DECIMAL_POINT,
     DIGITS,
     DIVIDE,
@@ -13,6 +14,7 @@ from .char_constants import (
     MODULO,
     MULTIPLY,
     NOT,
+    OR,
     PLUS,
     POWER,
     RIGHT_PAREN,
@@ -127,3 +129,15 @@ def is_not(char: Optional[str]) -> bool:
     """Check if character is a 'not' symbol."""
 
     return char == NOT
+
+
+def is_and(char: Optional[str]) -> bool:
+    """Check if character is an 'and' symbol."""
+
+    return char == AND
+
+
+def is_or(char: Optional[str]) -> bool:
+    """Check if character is an 'or' symbol."""
+
+    return char == OR

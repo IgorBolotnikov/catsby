@@ -79,6 +79,9 @@ def test_variable():
         (">=", TokenType.GTE),
         ("!", TokenType.NOT),
         ("!=", TokenType.NE),
+        ("==", TokenType.EQEQ),
+        ("&&", TokenType.AND),
+        ("||", TokenType.OR),
     ],
 )
 def test_logical_operators(char, token_type):
