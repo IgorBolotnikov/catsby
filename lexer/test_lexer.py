@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+import pytest
+
 from tokens import Token, TokenType
 
 from .lexer import Lexer
@@ -66,3 +68,25 @@ def test_variable():
         Token(TokenType.EQ),
         Token(TokenType.NUMBER, Decimal("100")),
     ]
+
+
+@pytest.mark.parametrize(
+    ["char", "token_type"],
+    [
+        ("<", TokenType.LT),
+        (">", TokenType.GT),
+        ("<=", TokenType.LTE),
+        (">=", TokenType.GTE),
+        ("!", TokenType.NOT),
+        ("!=", TokenType.NE),
+    ],
+)
+def test_logical_operators(char, token_type):
+    expression = f"10 {char} 10"
+    expected = [
+        Token(TokenType.NUMBER, Decimal("10")),
+        Token(token_type),
+        Token(TokenType.NUMBER, Decimal("10")),
+    ]
+    tokens = list(Lexer(expression).generate_tokens())
+    assert tokens == expected

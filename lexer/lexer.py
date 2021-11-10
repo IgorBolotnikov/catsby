@@ -5,14 +5,17 @@ from tokens import Token, TokenType
 
 from .char_constants import DECIMAL_POINT
 from .char_helpers import (
-    is_assignment,
     is_digit_or_point,
     is_divide,
+    is_equals,
+    is_greater_than,
     is_left_paren,
+    is_less_than,
     is_letter,
     is_minus,
     is_modulo,
     is_multiply,
+    is_not,
     is_plus,
     is_point,
     is_power,
@@ -67,8 +70,14 @@ class Lexer:
                 yield self.generate_power_operator()
             elif is_modulo(self._curr_char):
                 yield self.generate_modulo_operator()
-            elif is_assignment(self._curr_char):
+            elif is_equals(self._curr_char):
                 yield self.generate_assignment()
+            elif is_less_than(self._curr_char):
+                yield self.generate_less_than()
+            elif is_greater_than(self._curr_char):
+                yield self.generate_greater_than()
+            elif is_not(self._curr_char):
+                yield self.generate_not()
             else:
                 raise Exception(f"Illegal character, '{self._curr_char}'")
 
@@ -168,3 +177,30 @@ class Lexer:
         token_type = TokenType.KEYWORD if is_keyword(id_str) else TokenType.IDENTIFIER
 
         return Token(token_type, id_str)
+
+    def generate_less_than(self) -> Token:
+        """Generate 'less than' or 'less than or equals' token."""
+
+        self.advance()
+        if is_equals(self._curr_char):
+            self.advance()
+            return Token(TokenType.LTE)
+        return Token(TokenType.LT)
+
+    def generate_greater_than(self) -> Token:
+        """Generate 'greater than' or 'greater than or equals' token."""
+
+        self.advance()
+        if is_equals(self._curr_char):
+            self.advance()
+            return Token(TokenType.GTE)
+        return Token(TokenType.GT)
+
+    def generate_not(self) -> Token:
+        """Generate 'not' or 'not equals' token."""
+
+        self.advance()
+        if is_equals(self._curr_char):
+            self.advance()
+            return Token(TokenType.NE)
+        return Token(TokenType.NOT)

@@ -5,11 +5,14 @@ from .char_constants import (
     DIGITS,
     DIVIDE,
     EQ,
+    GT,
     LEFT_PAREN,
     LETTERS,
+    LT,
     MINUS,
     MODULO,
     MULTIPLY,
+    NOT,
     PLUS,
     POWER,
     RIGHT_PAREN,
@@ -102,7 +105,25 @@ def is_modulo(char: Optional[str]) -> bool:
     return char == MODULO
 
 
-def is_assignment(char: Optional[str]) -> bool:
-    """Check if character is an assignment sign."""
+def is_equals(char: Optional[str]) -> bool:
+    """Check if character is an equals symbol."""
 
     return char == EQ
+
+
+def is_less_than(char: Optional[str]) -> bool:
+    """Check if character is a 'less than' symbol."""
+
+    return char == LT
+
+
+def is_greater_than(char: Optional[str]) -> bool:
+    """Check if character is a 'greater than' symbol."""
+
+    return char == GT
+
+
+def is_not(char: Optional[str]) -> bool:
+    """Check if character is a 'not' symbol."""
+
+    return char == NOT
