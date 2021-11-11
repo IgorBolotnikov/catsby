@@ -3,13 +3,22 @@ from typing import Any, Iterable, NoReturn, Optional
 
 from nodes import (
     AddNode,
+    AndNode,
     AssignmentNode,
     DivideNode,
+    DoubleEqualsNode,
+    GreaterThanNode,
+    GreaterThanOrEqualsNode,
+    LessThanNode,
+    LessThanOrEqualsNode,
     MinusNode,
     ModuloNode,
     MultiplyNode,
     Node,
+    NotEqualsNode,
+    NotNode,
     NumberNode,
+    OrNode,
     PlusNode,
     PowerNode,
     SubtractNode,
@@ -17,14 +26,23 @@ from nodes import (
 )
 from tokens import (
     Token,
+    is_and,
     is_assignment,
     is_divide,
+    is_double_equals,
+    is_greater_than,
+    is_greater_than_or_equals,
     is_identifier,
     is_left_paren,
+    is_less_than,
+    is_less_than_or_equals,
     is_minus,
     is_modulo,
     is_multiply,
+    is_not,
+    is_not_equals,
     is_number,
+    is_or,
     is_plus,
     is_power,
     is_right_paren,
@@ -72,8 +90,65 @@ class Parser:
         raise Exception("Unexpected EOF")
 
     def _generate_expr(self) -> Node:
+        """Generate the expression.
+
+        Rules:
+        expression      : KEYWORD:var IDENTIFIER ASSIGNMENT expression
+                        : comp-expression ((AND|OR) comp-expression)*
+        """
         if self._curr_token and is_var(self._curr_token):
             return self._generate_assignment_node()
+
+        result = self._generate_comp_expr()
+
+        while self._curr_token:
+            if is_and(self._curr_token.type):
+                result = self._generate_and_node(result)
+            elif is_or(self._curr_token.type):
+                result = self._generate_or_node(result)
+            else:
+                break
+
+        return result
+
+    def _generate_comp_expr(self) -> Node:
+        """Generate the comparison expression.
+
+        Rules:
+        comp-expression : NOT comp-expression
+                        : math-expression ((LT|GT|LTE|GTE|NE|EQEQ) math-expression)*
+
+        """
+
+        if self._curr_token and is_not(self._curr_token.type):
+            return self._generate_not_node()
+
+        result = self._generate_math_expr()
+
+        while self._curr_token:
+            if is_less_than(self._curr_token.type):
+                result = self._generate_less_than_node(result)
+            elif is_greater_than(self._curr_token.type):
+                result = self._generate_greater_than_node(result)
+            elif is_less_than_or_equals(self._curr_token.type):
+                result = self._generate_less_than_or_equals_node(result)
+            elif is_greater_than_or_equals(self._curr_token.type):
+                result = self._generate_greater_than_or_equals_node(result)
+            elif is_not_equals(self._curr_token.type):
+                result = self._generate_not_equals_node(result)
+            elif is_double_equals(self._curr_token.type):
+                result = self._generate_double_equals_node(result)
+            else:
+                break
+
+        return result
+
+    def _generate_math_expr(self) -> Node:
+        """Generate mathematical expression.
+
+        Rules:
+        math-expression : term ((PLUS|MINUS) term)*
+        """
 
         result = self._generate_term()
 
@@ -88,6 +163,12 @@ class Parser:
         return result
 
     def _generate_term(self) -> Node:
+        """Generate the term.
+
+        Rules:
+        term            : factor ((MULTIPLY|DIVIDE|MODULO) factor)*
+        """
+
         result = self._generate_factor()
 
         while self._curr_token:
@@ -103,6 +184,12 @@ class Parser:
         return result
 
     def _generate_factor(self) -> Node:
+        """Generate the factor.
+
+        Rules:
+        factor          : (PLUS|MINUS) power
+        """
+
         if not self._curr_token:
             self._raise_unexpected_eof()
 
@@ -115,6 +202,12 @@ class Parser:
         return self._generate_power()
 
     def _generate_power(self) -> Node:
+        """Generate power.
+
+        Rules:
+        power           : atom ((POWER) factor)*
+        """
+
         result = self._generate_atom()
 
         while self._curr_token and is_power(self._curr_token.type):
@@ -122,6 +215,13 @@ class Parser:
         return result
 
     def _generate_atom(self) -> Node:
+        """Generate atom.
+
+        Rules:
+        atom            : DECIMAL|IDENTIFIER
+                        : LEFT_PAREN expression RIGHT_PAREN
+        """
+
         if not self._curr_token:
             self._raise_unexpected_eof()
 
@@ -194,6 +294,44 @@ class Parser:
         value = self._generate_expr()
         return AssignmentNode(name, value)
 
-    def _generate_value_access_node(self, token: Token) -> Node:
+    def _generate_value_access_node(self, token: Token) -> ValueAccessNode:
         self._advance()
         return ValueAccessNode(str(token.value))
+
+    def _generate_not_node(self) -> NotNode:
+        self._advance()
+        return NotNode(self._generate_comp_expr())
+
+    def _generate_and_node(self, node: Node) -> AndNode:
+        self._advance()
+        return AndNode(node, self._generate_comp_expr())
+
+    def _generate_or_node(self, node: Node) -> OrNode:
+        self._advance()
+        return OrNode(node, self._generate_comp_expr())
+
+    def _generate_less_than_node(self, node: Node) -> LessThanNode:
+        self._advance()
+        return LessThanNode(node, self._generate_math_expr())
+
+    def _generate_greater_than_node(self, node: Node) -> GreaterThanNode:
+        self._advance()
+        return GreaterThanNode(node, self._generate_math_expr())
+
+    def _generate_less_than_or_equals_node(self, node: Node) -> LessThanOrEqualsNode:
+        self._advance()
+        return LessThanOrEqualsNode(node, self._generate_math_expr())
+
+    def _generate_greater_than_or_equals_node(
+        self, node: Node
+    ) -> GreaterThanOrEqualsNode:
+        self._advance()
+        return GreaterThanOrEqualsNode(node, self._generate_math_expr())
+
+    def _generate_not_equals_node(self, node: Node) -> NotEqualsNode:
+        self._advance()
+        return NotEqualsNode(node, self._generate_math_expr())
+
+    def _generate_double_equals_node(self, node: Node) -> DoubleEqualsNode:
+        self._advance()
+        return DoubleEqualsNode(node, self._generate_math_expr())

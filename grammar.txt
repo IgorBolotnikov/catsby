@@ -1,8 +1,8 @@
-expression      : KEYWORD:var IDENTIFIER ASSIGNMENT expression
-                : comp-expression ((AND|OR) comp-expression)
+expression      : KEYWORD:var IDENTIFIER EQ expression
+                : comp-expression ((AND|OR) comp-expression)*
 
 comp-expression : NOT comp-expression
-                : math-expression ((LT|GT|LTE|GTE|NE|EQEQ) math-expression)
+                : math-expression ((LT|GT|LTE|GTE|NE|EQEQ) math-expression)*
 
 math-expression : term ((PLUS|MINUS) term)*
 

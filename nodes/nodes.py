@@ -100,7 +100,97 @@ class ValueAccessNode:
         return f"{self.name}"
 
 
-ExprNode = Union[SubtractNode, AddNode, DivideNode, MultiplyNode]
+@dataclass
+class LessThanNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}>{self.node_b})"
+
+
+@dataclass
+class GreaterThanNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}<{self.node_b})"
+
+
+@dataclass
+class LessThanOrEqualsNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}>={self.node_b})"
+
+
+@dataclass
+class GreaterThanOrEqualsNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}<={self.node_b})"
+
+
+@dataclass
+class NotEqualsNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}!={self.node_b})"
+
+
+@dataclass
+class NotNode:
+    node: Node
+
+    def __repr__(self) -> str:
+        return f"(!{self.node})"
+
+
+@dataclass
+class DoubleEqualsNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}=={self.node_b})"
+
+
+@dataclass
+class AndNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}&&{self.node_b})"
+
+
+@dataclass
+class OrNode:
+    node_a: Node
+    node_b: Node
+
+    def __repr__(self) -> str:
+        return f"({self.node_a}||{self.node_b})"
+
+
+ExprNode = Union[AndNode, OrNode]
+MathExprNode = Union[SubtractNode, AddNode]
+BinaryCompExprNode = Union[
+    LessThanNode,
+    GreaterThanNode,
+    LessThanOrEqualsNode,
+    GreaterThanOrEqualsNode,
+    NotEqualsNode,
+    DoubleEqualsNode,
+]
+UnaryCompNode = Union[NotNode]
 TermNode = Union[DivideNode, MultiplyNode, ModuloNode]
 Node = Union[
     NumberNode,
@@ -114,4 +204,13 @@ Node = Union[
     ModuloNode,
     AssignmentNode,
     ValueAccessNode,
+    LessThanNode,
+    GreaterThanNode,
+    LessThanOrEqualsNode,
+    GreaterThanOrEqualsNode,
+    NotEqualsNode,
+    NotNode,
+    DoubleEqualsNode,
+    AndNode,
+    OrNode,
 ]
