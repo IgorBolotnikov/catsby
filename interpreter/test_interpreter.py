@@ -1,23 +1,35 @@
 from decimal import Decimal
+from typing import Type
 
 import pytest
 
 from nodes import (
     AddNode,
+    AndNode,
     AssignmentNode,
+    BinaryCompExprNode,
     DivideNode,
+    DoubleEqualsNode,
+    GreaterThanNode,
+    GreaterThanOrEqualsNode,
+    LessThanNode,
+    LessThanOrEqualsNode,
     MinusNode,
     ModuloNode,
     MultiplyNode,
+    NotEqualsNode,
+    NotNode,
     NumberNode,
+    OrNode,
     PlusNode,
     PowerNode,
     SubtractNode,
+    UnaryCompNode,
     ValueAccessNode,
 )
 
 from .interpreter import Interpreter
-from .values import Number
+from .values import BooleanValue, False_, Number, True_
 
 
 def test_number():
@@ -85,3 +97,60 @@ def test_variable_assignment_exception():
     interpreter.visit(assign1_tree)
     with pytest.raises(Exception):
         interpreter.visit(assign2_tree)
+
+
+@pytest.mark.parametrize(
+    ["node", "expected"],
+    [
+        (LessThanNode, False_()),
+        (GreaterThanNode, True_()),
+        (LessThanOrEqualsNode, False_()),
+        (GreaterThanOrEqualsNode, True_()),
+        (NotEqualsNode, True_()),
+        (DoubleEqualsNode, False_()),
+        (AndNode, True_()),
+        (OrNode, True_()),
+    ],
+)
+def test_binary_logical_operators(
+    node: Type[BinaryCompExprNode], expected: BooleanValue
+):
+    value1 = Decimal("20")
+    value2 = Decimal("10")
+    tree = node(  # type: ignore
+        NumberNode(value1), NumberNode(value2)
+    )
+    interpreter = Interpreter()
+    result = interpreter.visit(tree)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ["node", "value", "expected"],
+    [(NotNode, Decimal("10"), False_()), (NotNode, Decimal("0"), True_())],
+)
+def test_unary_operators(
+    node: Type[UnaryCompNode], value: Decimal, expected: BooleanValue
+):
+    tree = node(NumberNode(value))  # type: ignore
+    interpreter = Interpreter()
+    result = interpreter.visit(tree)
+    assert result == expected
+
+
+def test_nested_logical_operators():
+    value1 = Decimal("0")
+    value2 = Decimal("20")
+    value3 = Decimal("5")
+    value4 = Decimal("80")
+    value5 = Decimal("15")
+    tree = AndNode(
+        NotNode(NumberNode(value1)),
+        LessThanOrEqualsNode(
+            AddNode(NumberNode(value2), NumberNode(value3)),
+            MultiplyNode(NumberNode(value4), NumberNode(value5)),
+        ),
+    )
+    interpreter = Interpreter()
+    result = interpreter.visit(tree)
+    assert result == True_()
