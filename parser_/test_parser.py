@@ -5,13 +5,23 @@ import pytest
 
 from nodes import (
     AddNode,
+    AndNode,
     AssignmentNode,
+    BinaryCompExprNode,
     DivideNode,
+    DoubleEqualsNode,
     ExprNode,
+    GreaterThanNode,
+    GreaterThanOrEqualsNode,
+    LessThanNode,
+    LessThanOrEqualsNode,
     MinusNode,
     ModuloNode,
     MultiplyNode,
+    NotEqualsNode,
+    NotNode,
     NumberNode,
+    OrNode,
     PlusNode,
     PowerNode,
     SubtractNode,
@@ -135,7 +145,7 @@ def test_variable_assignment():
     tokens = [
         Token(TokenType.KEYWORD, "var"),
         Token(TokenType.IDENTIFIER, "my_var1"),
-        Token(TokenType.ASSIGNMENT),
+        Token(TokenType.EQ),
         Token(TokenType.NUMBER, Decimal("100")),
         Token(TokenType.MULTIPLY),
         Token(TokenType.NUMBER, Decimal("2")),
@@ -154,3 +164,62 @@ def test_variable_access():
     ]
     tree = Parser(tokens).parse()
     assert tree == AddNode(ValueAccessNode("my_var1"), ValueAccessNode("my_var2"))
+
+
+@pytest.mark.parametrize(
+    ["token", "node_class"],
+    [
+        (Token(TokenType.LT), LessThanNode),
+        (Token(TokenType.GT), GreaterThanNode),
+        (Token(TokenType.LTE), LessThanOrEqualsNode),
+        (Token(TokenType.GTE), GreaterThanOrEqualsNode),
+        (Token(TokenType.NE), NotEqualsNode),
+        (Token(TokenType.EQEQ), DoubleEqualsNode),
+        (Token(TokenType.AND), AndNode),
+        (Token(TokenType.OR), OrNode),
+    ],
+)
+def test_binary_logical_operators(token, node_class: Type[BinaryCompExprNode]):
+    value1 = Decimal("10")
+    value2 = Decimal("20")
+    tokens = [Token(TokenType.NUMBER, value1), token, Token(TokenType.NUMBER, value2)]
+    expected = node_class(NumberNode(value1), NumberNode(value2))  # noqa
+    tree = Parser(tokens).parse()
+    assert tree == expected
+
+
+def test_unary_logical_operators():
+    value = Decimal("10")
+    tokens = [Token(TokenType.NOT), Token(TokenType.NUMBER, value)]
+    expected = NotNode(NumberNode(value))
+    tree = Parser(tokens).parse()
+    assert tree == expected
+
+
+def test_nested_logical_operators():
+    value1 = Decimal("10")
+    value2 = Decimal("20")
+    value3 = Decimal("5")
+    value4 = Decimal("80")
+    value5 = Decimal("15")
+    tokens = [
+        Token(TokenType.NOT),
+        Token(TokenType.NUMBER, value1),
+        Token(TokenType.AND),
+        Token(TokenType.NUMBER, value2),
+        Token(TokenType.PLUS),
+        Token(TokenType.NUMBER, value3),
+        Token(TokenType.LTE),
+        Token(TokenType.NUMBER, value4),
+        Token(TokenType.MULTIPLY),
+        Token(TokenType.NUMBER, value5),
+    ]
+    expected = AndNode(
+        NotNode(NumberNode(value1)),
+        LessThanOrEqualsNode(
+            AddNode(NumberNode(value2), NumberNode(value3)),
+            MultiplyNode(NumberNode(value4), NumberNode(value5)),
+        ),
+    )
+    tree = Parser(tokens).parse()
+    assert tree == expected

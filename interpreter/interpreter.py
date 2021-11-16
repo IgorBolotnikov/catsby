@@ -1,8 +1,10 @@
 from nodes import (
     AddNode,
     AssignmentNode,
+    LessThanNode,
     MinusNode,
     Node,
+    NotNode,
     NumberNode,
     PlusNode,
     PowerNode,
@@ -10,7 +12,7 @@ from nodes import (
 )
 
 from .symbol_table import SymbolTable
-from .values import Number
+from .values import BooleanValue, Number, to_boolean_value
 
 
 class Interpreter:
@@ -74,3 +76,39 @@ class Interpreter:
         if self._symbol_table.get(name) is not None:
             raise Exception(f"'{name}' is already defined")
         self._symbol_table.set(name, value)
+
+    def visit_LessThanNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value < self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_GreaterThanNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value > self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_LessThanOrEqualsNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value <= self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_GreaterThanOrEqualsNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value >= self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_DoubleEqualsNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value == self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_NotEqualsNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = self.visit(node.node_a).value != self.visit(node.node_b).value
+        return to_boolean_value(is_true)
+
+    def visit_AndNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = bool(self.visit(node.node_a).value and self.visit(node.node_b).value)
+        return to_boolean_value(is_true)
+
+    def visit_OrNode(self, node: LessThanNode) -> BooleanValue:
+        is_true = bool(self.visit(node.node_a).value or self.visit(node.node_b).value)
+        return to_boolean_value(is_true)
+
+    def visit_NotNode(self, node: NotNode) -> BooleanValue:
+        is_true = not self.visit(node.node).value
+        return to_boolean_value(is_true)
